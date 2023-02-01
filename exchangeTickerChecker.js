@@ -44,7 +44,7 @@ async function tickersDbRecordsUpdater(parsedJsonData) {
     //conpare every symbol with previousTickers and insert new tickers into DATABASE and previousTickers
     console.log('----' + (new Date().toLocaleString()) + '----');
     for (var i = 0 ; i < parsedJsonData.symbols.length; i++) {
-        if (parsedJsonData.symbols[i].symbol === "APTUSDT" && parsedJsonData.symbols[i].contractType === "PERPETUAL" && parsedJsonData.symbols[i].status === "TRADING" && !previousTickers.includes(parsedJsonData.symbols[i].symbol)) {
+        if (parsedJsonData.symbols[i].contractType === "PERPETUAL" && parsedJsonData.symbols[i].status === "TRADING" && !previousTickers.includes(parsedJsonData.symbols[i].symbol)) {
             previousTickers.push(parsedJsonData.symbols[i].symbol);
             let symbol = parsedJsonData.symbols[i].symbol;
             let baseAsset = parsedJsonData.symbols[i].baseAsset;
@@ -53,7 +53,7 @@ async function tickersDbRecordsUpdater(parsedJsonData) {
             let pricePrecision = parsedJsonData.symbols[i].pricePrecision;
             let quantityPrecision = parsedJsonData.symbols[i].quantityPrecision
             let sql = "INSERT INTO exchangeTickers (symbol,baseAsset,quoteAsset,listingStatus) VALUES (?,?,?,?)";
-            let sqlCreateTable = `CREATE TABLE ${symbol} (\`open_time\` BIGINT NOT NULL,\`interval\` VARCHAR(4) NOT NULL,\`open\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`high\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`low\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`close\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`volume\` DECIMAL(16, ${quantityPrecision}) NOT NULL,\`close_time\` BIGINT NOT NULL,\`quote_asset_volume\` DECIMAL(16, 5) NOT NULL,\`number_of_trades\` INT(11) NOT NULL,\`taker_buy_base_asset_volume\` DECIMAL(16, 8) NOT NULL,\`taker_buy_quote_asset_volume\` DECIMAL(16, 8) NOT NULL, PRIMARY KEY(\`open_time\`,\`interval\`))`
+            let sqlCreateTable = `CREATE TABLE ${symbol} (\`open_time\` BIGINT NOT NULL,\`interval\` ENUM('1m','3m','5m','15m','30m','1h','2h','4h','8h','12h','1d','3d','1w') NOT NULL,\`open\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`high\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`low\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`close\` DECIMAL(16, ${pricePrecision}) NOT NULL,\`volume\` DECIMAL(16, ${quantityPrecision}) NOT NULL,\`close_time\` BIGINT NOT NULL,\`quote_asset_volume\` DECIMAL(16, 5) NOT NULL,\`number_of_trades\` INT(11) NOT NULL,\`taker_buy_base_asset_volume\` DECIMAL(16, 8) NOT NULL,\`taker_buy_quote_asset_volume\` DECIMAL(16, 8) NOT NULL, PRIMARY KEY(\`open_time\`,\`interval\`))`
             let values = [symbol, baseAsset, quoteAsset, status];
             pool.query(sql, values, function (err, result) {
                 if (err) throw err;
